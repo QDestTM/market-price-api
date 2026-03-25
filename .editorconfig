@@ -1,0 +1,10 @@
+root = true
+
+[*]
+charset = utf-8
+
+# IDE0130: Namespace does not match folder structure
+dotnet_diagnostic.IDE0130.severity = none
+
+# IDE0290: Use primary constructor
+csharp_style_prefer_primary_constructors = false

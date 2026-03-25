@@ -1,0 +1,20 @@
+{
+	"version": "2.0.0",
+
+	"tasks": [
+		{
+			"label": "build-market-price-api",
+			"command": "dotnet",
+			"type": "process",
+
+			"args": [
+				"build",
+				"${config:csp.marketPriceApi}",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary"
+			],
+
+			"problemMatcher": "$msCompile"
+		},
+	]
+}

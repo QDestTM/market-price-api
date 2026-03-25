@@ -1,0 +1,88 @@
+{
+	"lib.marketPriceApi" : "${config:src.marketPriceApi}/bin/Debug/net10.0/MarketPriceAPI.dll",
+	"csp.marketPriceApi" : "${config:src.marketPriceApi}/MarketPriceAPI.csproj",
+	"src.marketPriceApi" : "${workspaceFolder}/src/MarketPriceAPI",
+
+	"files.exclude": {
+		"**/bin": true,
+		"**/obj": true,
+	},
+
+	"folder-color.pathColors": [
+		{
+			"folderPath": ".git\\",
+			"color": "foldercolorizer.color_993333",
+			"badge": "¤"
+		},
+		{
+			"folderPath": ".vscode\\",
+			"color": "foldercolorizer.color_336699",
+			"badge": "§"
+		},
+		{
+			"folderPath": ".obsidian\\",
+			"color": "foldercolorizer.color_6666cc",
+			"badge": "🗊"
+		},
+		{
+			"folderPath": "src\\",
+			"color": "foldercolorizer.color_339999",
+			"badge": "⚙"
+		},
+		{
+			"folderPath": "src\\MarketPriceAPI\\Properties\\",
+			"color": "foldercolorizer.color_6699cc",
+			"badge": "⅊"
+		},
+		{
+			"folderPath": ".gitattributes\\",
+			"color": "foldercolorizer.color_993333",
+			"badge": "↻"
+		},
+		{
+			"folderPath": ".gitignore\\",
+			"color": "foldercolorizer.color_993333",
+			"badge": "↻"
+		},
+		{
+			"folderPath": ".editorconfig\\",
+			"badge": "≡",
+			"color": "foldercolorizer.color_ccccff"
+		},
+		{
+			"folderPath": ".dockerignore\\",
+			"color": "foldercolorizer.color_006699",
+			"badge": "×"
+		},
+		{
+			"folderPath": "docker-compose.yaml\\",
+			"color": "foldercolorizer.color_006699",
+			"badge": "≈"
+		},
+		{
+			"folderPath": "Dockerfile\\",
+			"color": "foldercolorizer.color_0099cc",
+			"badge": "☰"
+		},
+		{
+			"folderPath": "MarketPriceAPI.pdf\\",
+			"color": "foldercolorizer.color_996666",
+			"badge": "🖺"
+		},
+		{
+			"folderPath": "MarketPriceAPI.sln\\",
+			"color": "foldercolorizer.color_666699",
+			"badge": "↓"
+		},
+		{
+			"folderPath": "MarketPriceAPI.csproj\\",
+			"color": "foldercolorizer.color_cc9900",
+			"badge": "⋄"
+		},
+		{
+			"folderPath": "README.md\\",
+			"color": "foldercolorizer.color_cccc66",
+			"badge": "༶"
+		}
+	]
+}

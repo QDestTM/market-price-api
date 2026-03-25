@@ -1,0 +1,20 @@
+{
+	"version": "0.2.0",
+
+	"configurations": [
+		{
+			"name": "Debug API",
+			"type": "coreclr",
+
+			"console": "internalConsole",
+			"stopAtEntry": false,
+			"request": "launch",
+
+			"internalConsoleOptions": "openOnSessionStart",
+			"preLaunchTask": "build-market-price-api",
+
+			"program" : "${config:lib.marketPriceApi}",
+			"cwd": "${config:src.marketPriceApi}",
+		}
+	]
+}
