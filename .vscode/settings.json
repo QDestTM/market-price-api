@@ -53,6 +53,16 @@
 			"color": "foldercolorizer.color_ccccff"
 		},
 		{
+			"folderPath": ".env\\",
+			"color": "foldercolorizer.color_cccc66",
+			"badge": "⌔"
+		},
+		{
+			"folderPath": ".env.example\\",
+			"color": "foldercolorizer.color_cccc66",
+			"badge": "⌔"
+		},
+		{
 			"folderPath": ".dockerignore\\",
 			"color": "foldercolorizer.color_006699",
 			"badge": "×"
