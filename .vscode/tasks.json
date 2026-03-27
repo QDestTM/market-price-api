@@ -16,5 +16,32 @@
 
 			"problemMatcher": "$msCompile"
 		},
+
+		{
+			"label": "start-mongo-db",
+			"type" : "process",
+
+			"isBackground": true,
+			"command" : "mongod",
+
+			"args" : [
+				"--dbpath", "${config:mongodb.data}",
+				"--port"  , "${config:mongodb.port}",
+				"${input:auth}", "--quiet"
+			],
+		}
+	],
+
+	"inputs": [
+		{
+			"id": "auth",
+			"description": "Select authentification flag",
+
+			"type": "pickString",
+			"options": [
+				"--auth"  ,
+				"--noauth"
+			]
+		}
 	]
 }

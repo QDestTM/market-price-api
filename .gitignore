@@ -1,6 +1,9 @@
 # Obsidian ignores
 .obsidian/**
 
+# MongoDB ignores
+mongodb/**
+
 # Output ingores
 **/bin/
 **/obj/

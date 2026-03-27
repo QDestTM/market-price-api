@@ -3,6 +3,9 @@
 	"csp.marketPriceApi" : "${config:src.marketPriceApi}/MarketPriceAPI.csproj",
 	"src.marketPriceApi" : "${workspaceFolder}/src/MarketPriceAPI",
 
+	"mongodb.data" : "${workspaceFolder}/mongodb",
+	"mongodb.port" : "24000",
+
 	"files.exclude": {
 		"**/bin": true,
 		"**/obj": true,
@@ -53,6 +56,11 @@
 			"folderPath": ".dockerignore\\",
 			"color": "foldercolorizer.color_006699",
 			"badge": "×"
+		},
+		{
+			"folderPath": "mongodb\\",
+			"color": "foldercolorizer.color_336633",
+			"badge": "⊢"
 		},
 		{
 			"folderPath": "docker-compose.yaml\\",
