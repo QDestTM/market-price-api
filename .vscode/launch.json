@@ -14,7 +14,9 @@
 			"preLaunchTask": "build-market-price-api",
 
 			"program" : "${config:lib.marketPriceApi}",
+
 			"cwd": "${config:src.marketPriceApi}",
+			"envFile": "${workspaceFolder}/.env"
 		}
 	]
 }
