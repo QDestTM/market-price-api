@@ -45,15 +45,12 @@ public sealed class MarketAssetRepository : IMarketAssetRepository
 		// Order the query by Id descending to get consistent sequences
 		assetsQuery = assetsQuery.OrderByDescending(a => a.Id);
 
-		// Populate query result with pagination information
-		int itemsCount = await assetsQuery.CountAsync();
+		// Populate pagination information in the query result
+		var pagination = queryResult.Paging;
 
-		queryResult.Paging = new PagingInfo()
-		{
-			Page = options.Page,
-			Pages = (int) MathF.Ceiling((float) itemsCount / options.Size),
-			Items = itemsCount
-		};
+		pagination.Items = await assetsQuery.CountAsync();
+		pagination.Pages = (int) MathF.Ceiling((float) pagination.Items / options.Size);
+		pagination.Page = options.Page;
 
 		// Apply pagination based on page number and page size
 		queryResult.Items = assetsQuery
