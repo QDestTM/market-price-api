@@ -69,6 +69,24 @@ public sealed class AssetPriceCache : IAssetPriceCache
 		}
 	}
 
+
+	public void ExpireCached(Guid id, string provider)
+	{
+		lock (sync)
+		{
+			cache.Remove( ToKey(id, provider) );
+		}
+	}
+
+
+	public IEnumerable<AssetPrice> GetAllCached()
+	{
+		lock (sync)
+		{
+			return [..cache.Values];
+		}
+	}
+
 	// ------------------------------------------------------------------------------------------------------<
 
 	private static string ToKey(AssetPrice price)
