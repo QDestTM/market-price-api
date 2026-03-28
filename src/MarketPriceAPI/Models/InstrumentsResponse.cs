@@ -10,7 +10,7 @@ public sealed class InstrumentsResponse
 	// ^ ----------------------------------------------------------------------------------------------------<
 
 	[JsonPropertyName("paging")]
-	public PagesInfo Paging { get; set; } = new();
+	public PagingInfo Paging { get; set; } = new();
 
 	[JsonPropertyName("data")]
 	public List<MarketAsset> Data { get; set; } = [];
