@@ -4,9 +4,13 @@
 # MongoDB ignores
 mongodb/**
 
+# Env file ignores
+.env
+
 # Output ingores
 **/bin/
 **/obj/
 
 # Other files
 MarketPriceAPI.pdf
+NOTES.md

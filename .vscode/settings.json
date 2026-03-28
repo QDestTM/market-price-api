@@ -98,6 +98,11 @@
 			"badge": "⋄"
 		},
 		{
+			"folderPath": "NOTES.md\\",
+			"color": "foldercolorizer.color_cccc66",
+			"badge": "༶"
+		},
+		{
 			"folderPath": "README.md\\",
 			"color": "foldercolorizer.color_cccc66",
 			"badge": "༶"
