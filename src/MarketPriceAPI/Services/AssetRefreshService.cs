@@ -10,15 +10,15 @@ using MarketPriceAPI.Models;
 using System.Net.Http.Json;
 using MarketPriceAPI.Data;
 using System.Threading;
-using System.Text.Json;
 using System.Net.Http;
-using System.Linq;
 using System.Net;
 using System;
 
 // Main content of the file
 public sealed class AssetRefreshService : BackgroundService
 {
+	public const string UriBase = "https://platform.fintacharts.com/api/instruments/v1/instruments";
+
 	public readonly TimeSpan RefreshTriesInterval = TimeSpan.FromMinutes(3);
 	public readonly TimeSpan RefreshItemsInterval = TimeSpan.FromDays(1.0);
 
@@ -30,8 +30,9 @@ public sealed class AssetRefreshService : BackgroundService
 
 	//! Private instance members
 	private readonly IMarketDatabaseContext marketDatabase;
-	private readonly ITokenService tokenService;
 	private readonly ILogger<AssetRefreshService> logger;
+	private readonly IMetadataService metadataService;
+	private readonly ITokenService tokenService;
 	private readonly HttpClient httpClient;
 
 	private AssetRefreshMarker? refreshMarker = null;
@@ -39,10 +40,12 @@ public sealed class AssetRefreshService : BackgroundService
 	// Public instance constructors
 	public AssetRefreshService(
 		IMarketDatabaseContext marketDatabase,
+		IMetadataService metadataService,
 		ILogger<AssetRefreshService> logger,
 		ITokenService tokenService,
 		HttpClient httpClient) : base()
 	{
+		this.metadataService = metadataService;
 		this.marketDatabase = marketDatabase;
 		this.tokenService = tokenService;
 		this.httpClient = httpClient;
@@ -62,7 +65,7 @@ public sealed class AssetRefreshService : BackgroundService
 			}
 			catch ( Exception exception )
 			{
-				logger.LogError($"Error refreshing assets: {exception.Message}");
+				logger.LogError(exception, "Error occurred while refreshing assets.");
 			}
 
 			await Task.Delay(RefreshTriesInterval, stoppingToken);
@@ -78,13 +81,10 @@ public sealed class AssetRefreshService : BackgroundService
 		// Check if refresh is needed based on stored marker
 		if ( refreshMarker is null || refreshMarker.RefreshAt < DateTime.UtcNow )
 		{
-			var providers = await GetProvidersAsync(ct);
-			var kinds = await GetKindsAsync(ct);
-
 			// Iterate through all providers and kinds to refresh assets
-			foreach ( string provider in providers )
+			foreach ( string provider in metadataService.Providers )
 			{
-				foreach ( string kind in kinds )
+				foreach ( string kind in metadataService.Kinds )
 				{
 					await RefreshAssets(provider, kind, ct);
 					await Task.Delay(500, ct); // Soft throttling
@@ -118,9 +118,14 @@ public sealed class AssetRefreshService : BackgroundService
 			logger.LogInformation($"Refreshing {provider}-{kind} page {page}/{pages}...");
 
 			// Create HTTP GET request with authorization token
-			var request = await CreateGetRequest(
-				$"https://platform.fintacharts.com/api/instruments/v1/instruments" +
-				$"?provider={provider}&kind={kind}&page={page}&size={AssetsPageSize}", ct);
+			var token = await tokenService.GetAccessTokenAsync(ct);
+
+			var request = new HttpRequestMessage(HttpMethod.Get, UriBase
+				+ $"?provider={provider}&kind={kind}&page={page}&size={AssetsPageSize}");
+
+			// Set Authorization header with bearer token for request
+			var authenticationHeader = new AuthenticationHeaderValue("Bearer", token);
+			request.Headers.Authorization = authenticationHeader;
 
 			// Send the request to the API and get the response
 			var response = await httpClient.SendAsync(request, ct);
@@ -173,54 +178,6 @@ public sealed class AssetRefreshService : BackgroundService
 		{
 			await marketDatabase.UpsertAssetsAsync(buffer, ct);
 		}
-	}
-
-	// ------------------------------------------------------------------------------------------------------<
-
-	private async Task<HttpRequestMessage> CreateGetRequest(string requestUri, CancellationToken ct)
-	{
-		var token = await tokenService.GetAccessTokenAsync(ct);
-		var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
-
-		// Set Authorization header with bearer token for request
-		var authenticationHeader = new AuthenticationHeaderValue("Bearer", token);
-		request.Headers.Authorization = authenticationHeader;
-
-		return request;
-	}
-
-	// ------------------------------------------------------------------------------------------------------<
-
-	private async Task<string[]> GetProvidersAsync(CancellationToken ct)
-	{
-		return await ExtractDataFromUri("https://platform.fintacharts.com/api/instruments/v1/providers", ct);
-	}
-
-
-	private async Task<string[]> GetKindsAsync(CancellationToken ct)
-	{
-		return await ExtractDataFromUri("https://platform.fintacharts.com/api/instruments/v1/kinds", ct);
-	}
-
-
-	private async Task<string[]> ExtractDataFromUri(string requestUri, CancellationToken ct)
-	{
-		var request = await CreateGetRequest(requestUri, ct);
-		var respond = await httpClient.SendAsync(request, ct);
-
-		respond.EnsureSuccessStatusCode();
-
-		// Read response stream and parse JSON document
-		using var stream = await respond.Content.ReadAsStreamAsync(ct);
-		using var json = await JsonDocument.ParseAsync(stream, default, ct);
-
-		// Extract "data" array from JSON and return as string array
-		return json.RootElement
-			.GetProperty("data")
-			.EnumerateArray()
-			.Select(x => x.GetString())
-			.Where(x => x is not null)
-			.ToArray()!;
 	}
 
 	// ------------------------------------------------------------------------------------------------------<
