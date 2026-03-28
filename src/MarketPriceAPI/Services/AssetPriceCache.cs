@@ -10,7 +10,7 @@ using System;
 // Main content of the file
 public sealed class AssetPriceCache : IAssetPriceCache
 {
-	public const int CacheMaxSize = 16;
+	public const int CacheMaxSize = 8;
 
 	// ^ ----------------------------------------------------------------------------------------------------<
 
