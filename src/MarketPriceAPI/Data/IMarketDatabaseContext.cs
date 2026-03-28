@@ -22,9 +22,9 @@ public interface IMarketDatabaseContext
 
 	Task SetTokenEntryAsync(TokenEntry entry, CancellationToken ct);
 
-	Task<AssetsRefreshMarker?> GetAssetsRefreshMarkerOrNullAsync(CancellationToken ct);
+	Task<AssetRefreshMarker?> GetAssetsRefreshMarkerOrNullAsync(CancellationToken ct);
 
-	Task SetAssetsRefreshMarkerAsync(AssetsRefreshMarker entry, CancellationToken ct);
+	Task SetAssetsRefreshMarkerAsync(AssetRefreshMarker entry, CancellationToken ct);
 
 	// ------------------------------------------------------------------------------------------------------<
 }

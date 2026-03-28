@@ -4,7 +4,7 @@ namespace MarketPriceAPI.Models;
 using System.Text.Json.Serialization;
 
 // Main content of the file
-public sealed class FintachartsPagesInfo
+public sealed class PagesInfo
 {
 	// ^ ----------------------------------------------------------------------------------------------------<
 
@@ -15,6 +15,7 @@ public sealed class FintachartsPagesInfo
 	public int Pages { get; set; } = 0;
 
 	[JsonPropertyName("items")]
+	[JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingDefault)]
 	public int Items { get; set; } = 0;
 
 	// ------------------------------------------------------------------------------------------------------<

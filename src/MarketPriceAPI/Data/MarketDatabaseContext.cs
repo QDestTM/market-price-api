@@ -75,16 +75,16 @@ public sealed class MarketDatabaseContext : IMarketDatabaseContext
 	}
 
 
-	public async Task<AssetsRefreshMarker?> GetAssetsRefreshMarkerOrNullAsync(CancellationToken ct)
+	public async Task<AssetRefreshMarker?> GetAssetsRefreshMarkerOrNullAsync(CancellationToken ct)
 	{
-		var filter = Builders<AssetsRefreshMarker>.Filter.Eq(x => x.Id, AssetsRefreshMarker.DefaultId);
+		var filter = Builders<AssetRefreshMarker>.Filter.Eq(x => x.Id, AssetRefreshMarker.DefaultId);
 		return await GetSystemDocument(filter, ct);
 	}
 
 
-	public async Task SetAssetsRefreshMarkerAsync(AssetsRefreshMarker entry, CancellationToken ct)
+	public async Task SetAssetsRefreshMarkerAsync(AssetRefreshMarker entry, CancellationToken ct)
 	{
-		var filter = Builders<AssetsRefreshMarker>.Filter.Eq(x => x.Id, AssetsRefreshMarker.DefaultId);
+		var filter = Builders<AssetRefreshMarker>.Filter.Eq(x => x.Id, AssetRefreshMarker.DefaultId);
 		await SetSystemDocument(filter, entry, ct);
 	}
 

@@ -6,9 +6,9 @@ using MongoDB.Bson;
 using System;
 
 // Main content of the file
-public sealed class AssetsRefreshMarker
+public sealed class AssetRefreshMarker
 {
-	public const string DefaultId = "assets_refresh_marker";
+	public const string DefaultId = "asset_refresh_marker";
 
 	// ^ ----------------------------------------------------------------------------------------------------<
 

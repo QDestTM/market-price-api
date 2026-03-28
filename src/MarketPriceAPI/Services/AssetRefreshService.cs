@@ -17,7 +17,7 @@ using System.Net;
 using System;
 
 // Main content of the file
-public sealed class AssetsRefreshService : BackgroundService
+public sealed class AssetRefreshService : BackgroundService
 {
 	public readonly TimeSpan RefreshTriesInterval = TimeSpan.FromMinutes(3);
 	public readonly TimeSpan RefreshItemsInterval = TimeSpan.FromDays(1.0);
@@ -30,17 +30,17 @@ public sealed class AssetsRefreshService : BackgroundService
 
 	//! Private instance members
 	private readonly IMarketDatabaseContext marketDatabase;
-	private readonly IFintachartsTokenService tokenService;
-	private readonly ILogger<AssetsRefreshService> logger;
+	private readonly ITokenService tokenService;
+	private readonly ILogger<AssetRefreshService> logger;
 	private readonly HttpClient httpClient;
 
-	private AssetsRefreshMarker? refreshMarker = null;
+	private AssetRefreshMarker? refreshMarker = null;
 
 	// Public instance constructors
-	public AssetsRefreshService(
+	public AssetRefreshService(
 		IMarketDatabaseContext marketDatabase,
-		ILogger<AssetsRefreshService> logger,
-		IFintachartsTokenService tokenService,
+		ILogger<AssetRefreshService> logger,
+		ITokenService tokenService,
 		HttpClient httpClient) : base()
 	{
 		this.marketDatabase = marketDatabase;
@@ -96,7 +96,7 @@ public sealed class AssetsRefreshService : BackgroundService
 			// Schedule next refresh by updating the marker in the database
 			var refreshAt = DateTime.UtcNow + RefreshItemsInterval;
 
-			refreshMarker = new AssetsRefreshMarker() { RefreshAt = refreshAt};
+			refreshMarker = new AssetRefreshMarker() { RefreshAt = refreshAt};
 			await marketDatabase.SetAssetsRefreshMarkerAsync(refreshMarker, ct);
 
 			logger.LogInformation("Assets succesfully refreshed.");
@@ -145,7 +145,7 @@ public sealed class AssetsRefreshService : BackgroundService
 
 			// Deserialize JSON response into instruments object
 			var instrumentsResponse = await response.Content
-				.ReadFromJsonAsync<FintachartsInstrumentsResponse>(ct);
+				.ReadFromJsonAsync<InstrumentsResponse>(ct);
 
 			// Add received instruments to buffer and update total pages
 			if ( instrumentsResponse is not null )

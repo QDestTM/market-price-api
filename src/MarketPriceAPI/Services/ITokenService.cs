@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Threading;
 
 // Main content of the file
-public interface IFintachartsTokenService
+public interface ITokenService
 {
 	// ^ ----------------------------------------------------------------------------------------------------<
 

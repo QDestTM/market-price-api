@@ -5,12 +5,12 @@ using System.Text.Json.Serialization;
 using System.Collections.Generic;
 
 // Main content of the file
-public sealed class FintachartsInstrumentsResponse
+public sealed class InstrumentsResponse
 {
 	// ^ ----------------------------------------------------------------------------------------------------<
 
 	[JsonPropertyName("paging")]
-	public FintachartsPagesInfo Paging { get; set; } = new();
+	public PagesInfo Paging { get; set; } = new();
 
 	[JsonPropertyName("data")]
 	public List<MarketAsset> Data { get; set; } = [];

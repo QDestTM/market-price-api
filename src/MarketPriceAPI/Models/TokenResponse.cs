@@ -4,7 +4,7 @@ namespace MarketPriceAPI.Models;
 using System.Text.Json.Serialization;
 
 // Main content of the file
-public sealed class FintachartsTokenResponse
+public sealed class TokenResponse
 {
 	// ^ ----------------------------------------------------------------------------------------------------<
 

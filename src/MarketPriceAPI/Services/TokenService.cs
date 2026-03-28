@@ -14,7 +14,7 @@ using System.Net.Http;
 using System;
 
 // Main content of the file
-public sealed class FintachartsTokenService : IFintachartsTokenService
+public sealed class TokenService : ITokenService
 {
 	private const int TokenExpiryBufferSeconds = 16;
 
@@ -28,7 +28,7 @@ public sealed class FintachartsTokenService : IFintachartsTokenService
 	private TokenEntry? tokenEntry = null;
 
 	// Public instance constructors
-	public FintachartsTokenService(
+	public TokenService(
 		IMarketDatabaseContext marketDatabase,
 		IOptions<AuthOptions> authOptions,
 		HttpClient httpClient)
@@ -65,7 +65,7 @@ public sealed class FintachartsTokenService : IFintachartsTokenService
 
 	[MemberNotNull(nameof(tokenEntry))]
 	private async Task UpdateTokenEntryFromResponseAsync(
-		FintachartsTokenResponse response, CancellationToken ct)
+		TokenResponse response, CancellationToken ct)
 	{
 		var utcNow = DateTime.UtcNow;
 
@@ -88,7 +88,7 @@ public sealed class FintachartsTokenService : IFintachartsTokenService
 
 	// ------------------------------------------------------------------------------------------------------<
 
-	private async Task<FintachartsTokenResponse> RequestAccessTokenAsync(CancellationToken ct)
+	private async Task<TokenResponse> RequestAccessTokenAsync(CancellationToken ct)
 	{
 		var body = new Dictionary<string, string>
 		{
@@ -103,7 +103,7 @@ public sealed class FintachartsTokenService : IFintachartsTokenService
 	}
 
 
-	private async Task<FintachartsTokenResponse> RefreshAccessTokenAsync(CancellationToken ct)
+	private async Task<TokenResponse> RefreshAccessTokenAsync(CancellationToken ct)
 	{
 		ArgumentNullException.ThrowIfNull(tokenEntry, nameof(tokenEntry));
 
@@ -119,7 +119,7 @@ public sealed class FintachartsTokenService : IFintachartsTokenService
 	}
 
 
-	private async Task<FintachartsTokenResponse> PostTokenRequestAsync(
+	private async Task<TokenResponse> PostTokenRequestAsync(
 		Dictionary<string, string> body, CancellationToken ct)
 	{
 		const string requestUri = "https://platform.fintacharts.com/" +
@@ -137,7 +137,7 @@ public sealed class FintachartsTokenService : IFintachartsTokenService
 
 		// Read response content and deserialize it into TokenRespond
 		var json = await response.Content.ReadAsStringAsync(ct);
-		return JsonSerializer.Deserialize<FintachartsTokenResponse>(json)!;
+		return JsonSerializer.Deserialize<TokenResponse>(json)!;
 	}
 
 	// ------------------------------------------------------------------------------------------------------<
