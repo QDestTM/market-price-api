@@ -14,14 +14,17 @@ public sealed class AssetPriceRepository : IAssetPriceRepository
 
 	//! Private instance members
 	private readonly IAssetPriceStreamService assetPriceStream;
+	private readonly IMetadataService metadataService;
 	private readonly IAssetPriceCache priceCache;
 
 	// Public instance constructors
 	public AssetPriceRepository(
 		IAssetPriceStreamService assetPriceStream,
+		IMetadataService metadataService,
 		IAssetPriceCache priceCache)
 	{
 		this.assetPriceStream = assetPriceStream;
+		this.metadataService = metadataService;
 		this.priceCache = priceCache;
 	}
 
@@ -30,6 +33,12 @@ public sealed class AssetPriceRepository : IAssetPriceRepository
 	public async Task<AssetPrice?> GetAssetPriceOrNullAsync(
 		Guid id, string provider, CancellationToken ct)
 	{
+		if ( !metadataService.Providers.Contains(provider) )
+		{
+			return null;
+		}
+
+		// Try to get the price from cache first
 		var cachedPrice = priceCache.GetOrNull(id, provider);
 
 		// Subscribe to stream if price is not cached yet
