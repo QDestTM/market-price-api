@@ -69,7 +69,7 @@ public sealed class AssetsRefreshService : BackgroundService
 		}
 	}
 
-	// ------------------------------------------------------------------------------------------------------<
+	// @ ----------------------------------------------------------------------------------------------------<
 
 	private async Task RefreshAssets(CancellationToken ct)
 	{
