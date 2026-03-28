@@ -1,6 +1,7 @@
 namespace MarketPriceAPI.Repositories;
 
 // Namespaces used by this file
+using MarketPriceAPI.Services;
 using System.Threading.Tasks;
 using MarketPriceAPI.Models;
 using MarketPriceAPI.Data;
@@ -16,10 +17,14 @@ public sealed class MarketAssetRepository : IMarketAssetRepository
 
 	//! Private instance members
 	private readonly IMarketDatabaseContext marketDatabase;
+	private readonly IMetadataService metadataService;
 
 	// Public instance constructors
-	public MarketAssetRepository(IMarketDatabaseContext marketDatabase)
+	public MarketAssetRepository(
+		IMarketDatabaseContext marketDatabase,
+		IMetadataService metadataService)
 	{
+		this.metadataService = metadataService;
 		this.marketDatabase = marketDatabase;
 	}
 
@@ -33,7 +38,14 @@ public sealed class MarketAssetRepository : IMarketAssetRepository
 		// Apply filters by asset kind/symbol if specified
 		if ( !string.IsNullOrEmpty(options.Kind) )
 		{
-			assetsQuery = assetsQuery.Where(a => a.Kind == options.Kind);
+			if ( metadataService.Kinds.Contains(options.Kind) )
+			{
+				assetsQuery = assetsQuery.Where(a => a.Kind == options.Kind);
+			}
+			else // Kind not recognized, return empty result set
+			{
+				assetsQuery = Enumerable.Empty<MarketAsset>().AsQueryable();
+			}
 		}
 
 		if ( !string.IsNullOrEmpty(options.Symbol) )
