@@ -9,7 +9,7 @@ public sealed class PagingInfo
 	// ^ ----------------------------------------------------------------------------------------------------<
 
 	[JsonPropertyName("page")]
-	public int Page { get; set; } = 0;
+	public int Page { get; set; } = 1;
 
 	[JsonPropertyName("pages")]
 	public int Pages { get; set; } = 0;
