@@ -1,7 +1,6 @@
 namespace MarketPriceAPI.Repositories;
 
 // Namespaces used by this file
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using MarketPriceAPI.Models;
 using System.Threading;
@@ -12,7 +11,7 @@ public interface IMarketAssetRepository
 {
 	// ^ ----------------------------------------------------------------------------------------------------<
 
-	Task<IEnumerable<MarketAsset>> QueryAssetsAsync(QueryAssetsOptions queryOptions);
+	Task<QueryAssetsResult> QueryAssetsAsync(QueryAssetsOptions queryOptions);
 
 	Task<MarketAsset?> GetAssetByIdOrNullAsync(Guid id, CancellationToken ct);
 

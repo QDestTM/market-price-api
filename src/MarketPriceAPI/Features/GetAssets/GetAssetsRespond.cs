@@ -13,11 +13,8 @@ public sealed record GetAssetsRespond
 	[property: JsonPropertyName("items")]
 	List<MarketAsset> Items,
 
-	[property: JsonPropertyName("page")]
-	int Page,
-
-	[property: JsonPropertyName("size")]
-	int Size
+	[property: JsonPropertyName("pages")]
+	PagingInfo Paging
 
 	// ------------------------------------------------------------------------------------------------------<
 );

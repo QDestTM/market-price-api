@@ -1,7 +1,6 @@
 namespace MarketPriceAPI.Repositories;
 
 // Namespaces used by this file
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using MarketPriceAPI.Models;
 using MarketPriceAPI.Data;
@@ -26,9 +25,10 @@ public sealed class MarketAssetRepository : IMarketAssetRepository
 
 	// # ----------------------------------------------------------------------------------------------------<
 
-	public async Task<IEnumerable<MarketAsset>> QueryAssetsAsync(QueryAssetsOptions options)
+	public async Task<QueryAssetsResult> QueryAssetsAsync(QueryAssetsOptions options)
 	{
 		var assetsQuery = await marketDatabase.QueryAssetsAsync();
+		var queryResult = new QueryAssetsResult();
 
 		// Apply filters by asset kind/symbol if specified
 		if ( !string.IsNullOrEmpty(options.Kind) )
@@ -45,11 +45,23 @@ public sealed class MarketAssetRepository : IMarketAssetRepository
 		// Order the query by Id descending to get consistent sequences
 		assetsQuery = assetsQuery.OrderByDescending(a => a.Id);
 
+		// Populate query result with pagination information
+		int itemsCount = await assetsQuery.CountAsync();
+
+		queryResult.Paging = new PagingInfo()
+		{
+			Page = options.Page,
+			Pages = (int) MathF.Ceiling((float) itemsCount / options.Size),
+			Items = itemsCount
+		};
+
 		// Apply pagination based on page number and page size
-		return assetsQuery
+		queryResult.Items = assetsQuery
 			.Skip((options.Page - 1) * options.Size)
 			.Take(options.Size)
 			.AsEnumerable();
+
+		return queryResult;
 	}
 
 

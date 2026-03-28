@@ -40,8 +40,8 @@ public sealed class GetAssetsEndpoint : IEndpointDefinition
 		var options = QueryOptionsFromEndpointQuery(query);
 
 		// Fetch filtered and paginated assets than create response object with items
-		var items = await assetRepository.QueryAssetsAsync(options);
-		var respond = new GetAssetsRespond([..items], options.Page, options.Size);
+		var queryResult = await assetRepository.QueryAssetsAsync(options);
+		var respond = new GetAssetsRespond([..queryResult.Items], queryResult.Paging);
 
 		return Results.Ok(respond); // Return HTTP 200 OK with the response payload
 	}
