@@ -9,8 +9,8 @@ public sealed record GetAssetByIdRespond
 (
 	// ^ ----------------------------------------------------------------------------------------------------<
 
-	[property: JsonPropertyName("item")]
-	MarketAsset? Item
+	[property: JsonPropertyName("data")]
+	MarketAsset Data
 
 	// ------------------------------------------------------------------------------------------------------<
 );
