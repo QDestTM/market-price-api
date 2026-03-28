@@ -36,13 +36,13 @@ public sealed class AssetPriceCache : IAssetPriceCache
 			var key = ToKey(price.InstrumentId, price.Provider);
 			DateTime utcNow = DateTime.UtcNow;
 
-			// 
+			// Check if the price already exists in the cache
 			if ( !cache.TryGetValue(key, out var cachedPrice) )
 			{
 				price.LastUpdated = utcNow;
 				cache[key] = price;
 			}
-			else
+			else // Update existing cached price fields if new values are provided
 			{
 				cachedPrice.Ask = price.Ask ?? cachedPrice.Ask;
 				cachedPrice.Bid = price.Bid ?? cachedPrice.Bid;
@@ -51,7 +51,7 @@ public sealed class AssetPriceCache : IAssetPriceCache
 				cachedPrice.LastUpdated = utcNow;
 			}
 
-			// 
+			// Evict the oldest entry if the cache exceeds its maximum size
 			AssetPrice? removePrice = null;
 
 			if ( cache.Count > CacheMaxSize )
