@@ -57,12 +57,12 @@ public sealed class AssetsRefreshService : BackgroundService
 		{
 			try
 			{
+				logger.LogInformation("Refreshing assets...");
 				await RefreshAssets(stoppingToken);
-				logger.LogInformation("Assets succesfully refreshed.");
 			}
 			catch ( Exception exception )
 			{
-				logger.LogError("Error refreshing assets: {}", exception.Message);
+				logger.LogError($"Error refreshing assets: {exception.Message}");
 			}
 
 			await Task.Delay(RefreshTriesInterval, stoppingToken);
@@ -98,6 +98,12 @@ public sealed class AssetsRefreshService : BackgroundService
 
 			refreshMarker = new AssetsRefreshMarker() { RefreshAt = refreshAt};
 			await marketDatabase.SetAssetsRefreshMarkerAsync(refreshMarker, ct);
+
+			logger.LogInformation("Assets succesfully refreshed.");
+		}
+		else
+		{
+			logger.LogInformation("Assets is up to date. No refresh needed.");
 		}
 	}
 
