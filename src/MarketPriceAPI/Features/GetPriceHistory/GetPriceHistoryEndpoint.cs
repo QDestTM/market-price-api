@@ -22,6 +22,11 @@ public sealed class GetPriceHistoryEndpoint : IEndpointDefinition
 	public void Map(IEndpointRouteBuilder builder)
 	{
 		builder.MapGet(Endpoint, GetPriceHistoryAsync)
+			.WithDisplayName("Get Price History")
+			.WithDescription("Retrieves historical price data for a specific " +
+							"asset over a given date range. " +
+							"Supports optional interval and periodicity parameters. " +
+							"Returns 400 Bad Request if query parameters are invalid.")
 			.Produces<GetPriceHistoryResponse>(StatusCodes.Status200OK)
 			.Produces<EndpointErrorResponse>(StatusCodes.Status400BadRequest)
 			.MapToApiVersion(1.0);

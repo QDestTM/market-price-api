@@ -21,6 +21,9 @@ public sealed class GetAssetByIdEndpoint : IEndpointDefinition
 	public void Map(IEndpointRouteBuilder builder)
 	{
 		builder.MapGet(Endpoint, GetAssetByIdAsync)
+			.WithDisplayName("Get Asset by Id")
+			.WithDescription("Retrieves detailed information about a specific financial asset " +
+							"by its unique identifier (GUID).")
 			.Produces<GetAssetByIdResponse>(StatusCodes.Status200OK)
 			.Produces(StatusCodes.Status404NotFound)
 			.MapToApiVersion(1.0);

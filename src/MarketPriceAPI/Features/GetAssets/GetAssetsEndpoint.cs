@@ -25,6 +25,9 @@ public sealed class GetAssetsEndpoint : IEndpointDefinition
 	public void Map(IEndpointRouteBuilder builder)
 	{
 		builder.MapGet(Endpoint, GetAssetsAsync)
+			.WithDisplayName("Get Assets")
+			.WithDescription("Retrieves a paginated list of financial assets with " +
+							"optional filtering by symbol or kind.")
 			.Produces<EndpointErrorResponse>(StatusCodes.Status400BadRequest)
 			.Produces<GetAssetsResponse>(StatusCodes.Status200OK)
 			.MapToApiVersion(1.0);

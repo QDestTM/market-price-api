@@ -21,6 +21,11 @@ public sealed class GetPriceEndpoint : IEndpointDefinition
 	public void Map(IEndpointRouteBuilder builder)
 	{
 		builder.MapGet(Endpoint, GetPriceAsync)
+			.WithDisplayName("Get Price")
+			.WithDescription("Retrieves the real-time price of a specific asset from " +
+							"the given provider by its unique identifier (GUID). " +
+							"If no price is available (404 Not Found), it may be worth retrying, " +
+							"as the data might not have arrived yet.")
 			.Produces<GetPriceResponse>(StatusCodes.Status200OK)
 			.Produces(StatusCodes.Status404NotFound)
 			.MapToApiVersion(1.0);
