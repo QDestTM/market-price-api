@@ -19,9 +19,6 @@ public sealed class AssetPriceStreamService : BackgroundService, IAssetPriceStre
 	public static readonly TimeSpan KeepAliveInterval = TimeSpan.FromMinutes(1.9);
 	public static readonly TimeSpan ReconnectInterval = TimeSpan.FromSeconds(5.0);
 
-	public static readonly TimeSpan CacheCleanupInterval = TimeSpan.FromSeconds(8.0);
-	public static readonly TimeSpan CacheExpireInterval = TimeSpan.FromMinutes(3.0);
-
 	public const int MessageBufferSize = 8192;
 
 	// ^ ----------------------------------------------------------------------------------------------------<
@@ -35,8 +32,6 @@ public sealed class AssetPriceStreamService : BackgroundService, IAssetPriceStre
 
 	private CancellationTokenSource subTasksToken = null!; // ExecuteAsync
 	private ClientWebSocket socket = null!; // ExecuteAsync
-
-	private Task cacheCleanupTask = null!; // ExecuteAsync
 	private Task keepAliveTask = null!; // ExecuteAsync
 
 	// Public instance constructors
@@ -67,11 +62,8 @@ public sealed class AssetPriceStreamService : BackgroundService, IAssetPriceStre
 			// Restore all active subscriptions after reconnect
 			await RestoreSubscriptionsAsync(stoppingToken);
 
-			// Start background tasks for cache cleanup and keep-alive pings
-			subTasksToken = CancellationTokenSource
-				.CreateLinkedTokenSource(stoppingToken);
-
-			cacheCleanupTask = CacheCleanupLoopAsync(subTasksToken.Token);
+			// Start background tasks for keep-alive pings
+			subTasksToken = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
 			keepAliveTask = KeepAliveLoopAsync(subTasksToken.Token);
 
 			// Start listening for incoming WebSocket messages
@@ -94,7 +86,6 @@ public sealed class AssetPriceStreamService : BackgroundService, IAssetPriceStre
 			}
 
 			// Await completion of background tasks before cleanup
-			await cacheCleanupTask;
 			await keepAliveTask;
 
 			subTasksToken.Dispose();
@@ -183,41 +174,6 @@ public sealed class AssetPriceStreamService : BackgroundService, IAssetPriceStre
 			catch ( Exception exception )
 			{
 				logger.LogError(exception, "Error occurred in keep-alive loop.");
-			}
-		}
-	}
-
-
-	private async Task CacheCleanupLoopAsync(CancellationToken ct)
-	{
-		while ( !ct.IsCancellationRequested && socket.State == WebSocketState.Open )
-		{
-			try
-			{
-				DateTime utcNow = DateTime.UtcNow;
-
-				// Iterate through cached prices and unsubscribe expired entries
-				foreach ( var price in priceCache.GetAllCached() )
-				{
-					if ( utcNow - price.LastUpdated > CacheExpireInterval )
-					{
-						var command = new StreamSubscriptionCommand(price, false);
-
-						priceCache.ExpireCached(command.Id, command.Provider);
-						await SendSubscriptionCommand(command, ct);
-					}
-				}
-
-				// Wait before next cache cleanup iteration
-				await Task.Delay(CacheCleanupInterval, ct);
-			}
-			catch ( OperationCanceledException )
-			{
-				// Expected when the task is cancelled
-			}
-			catch ( Exception exception )
-			{
-				logger.LogError(exception, "Error occurred in cache cleanup loop.");
 			}
 		}
 	}
