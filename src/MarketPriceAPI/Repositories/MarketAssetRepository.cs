@@ -42,9 +42,10 @@ public sealed class MarketAssetRepository : IMarketAssetRepository
 			{
 				assetsQuery = assetsQuery.Where(a => a.Kind == options.Kind);
 			}
-			else // Kind not recognized, return empty result set
+			else // Unknown kind specified, return result with error message
 			{
-				assetsQuery = Enumerable.Empty<MarketAsset>().AsQueryable();
+				queryResult.Error = $"Kind '{options.Kind}' does not exist.";
+				return queryResult;
 			}
 		}
 
