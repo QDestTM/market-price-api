@@ -25,6 +25,7 @@ public sealed class GetAssetsEndpoint : IEndpointDefinition
 	public void Map(IEndpointRouteBuilder builder)
 	{
 		builder.MapGet(Endpoint, GetAssetsAsync)
+			.Produces<EndpointErrorResponse>(StatusCodes.Status400BadRequest)
 			.Produces<GetAssetsRespond>(StatusCodes.Status200OK)
 			.MapToApiVersion(1.0);
 	}
@@ -39,10 +40,16 @@ public sealed class GetAssetsEndpoint : IEndpointDefinition
 	{
 		var options = QueryOptionsFromEndpointQuery(query);
 
-		// Fetch filtered and paginated assets than create response object with items
+		// Execute assets query with applied filters and pagination
 		var queryResult = await assetRepository.QueryAssetsAsync(options);
-		var respond = new GetAssetsRespond([..queryResult.Items], queryResult.Paging);
 
+		if ( !string.IsNullOrEmpty(queryResult.Error) )
+		{
+			var errorResponse = new EndpointErrorResponse(queryResult.Error);
+			return Results.BadRequest(errorResponse);
+		}
+
+		var respond = new GetAssetsRespond([..queryResult.Items], queryResult.Paging);
 		return Results.Ok(respond); // Return HTTP 200 OK with the response payload
 	}
 
