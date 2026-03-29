@@ -73,6 +73,18 @@ public static class Program
 		})
 			.ValidateDataAnnotations()
 			.ValidateOnStart();
+
+		// Bind MongoDB connection settings from configuration with fallback defaults
+		builder.Services.AddOptions<MongoDbOptions>().Configure((options) =>
+		{
+			var configuration = builder.Configuration;
+
+			options.Host = configuration.GetValue("MongoDB:Host", "localhost");
+			options.Auth = configuration.GetValue("MongoDB:Auth", "admin");
+			options.Port = configuration.GetValue("MongoDB:Port", 27017u);
+		})
+			.ValidateDataAnnotations()
+			.ValidateOnStart();
 	}
 
 
@@ -103,12 +115,13 @@ public static class Program
 	{
 		builder.Services.AddSingleton<IMongoClient>((sp) =>
 		{
+			var mongoDbOptions = sp.GetRequiredService<IOptions<MongoDbOptions>>().Value;
 			var authOptions = sp.GetRequiredService<IOptions<AuthOptions>>().Value;
 
 			var auth = $"{authOptions.MongoDbUsername}:{authOptions.MongoDbPassword}";
-			var host = "localhost:24000";
+			var host = $"{mongoDbOptions.Host}:{mongoDbOptions.Port}";
 
-			return new MongoClient($"mongodb://{auth}@{host}/?authSource=admin");
+			return new MongoClient($"mongodb://{auth}@{host}/?authSource={mongoDbOptions.Auth}");
 		});
 
 		builder.Services.AddSingleton<IMarketDatabaseContext>((sp) =>
