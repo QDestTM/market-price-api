@@ -15,5 +15,7 @@ public interface IMarketAssetRepository
 
 	Task<MarketAsset?> GetAssetByIdOrNullAsync(Guid id, CancellationToken ct);
 
+	Task<bool> IsAssetExistAsync(Guid id, CancellationToken ct);
+
 	// ------------------------------------------------------------------------------------------------------<
 }

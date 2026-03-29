@@ -82,5 +82,14 @@ public sealed class MarketAssetRepository : IMarketAssetRepository
 		return await assetsQuery.Where(x => x.Id == id).FirstOrDefaultAsync(ct);
 	}
 
+
+	public async Task<bool> IsAssetExistAsync(Guid id, CancellationToken ct)
+	{
+		var assetsQuery = await marketDatabase.QueryAssetsAsync();
+
+		// Check if any asset with the specified ID exists
+		return await assetsQuery.AnyAsync(x => x.Id == id, ct);
+	}
+
 	// ------------------------------------------------------------------------------------------------------<
 }
