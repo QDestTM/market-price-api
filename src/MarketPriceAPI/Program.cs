@@ -54,7 +54,7 @@ public static class Program
 			app.UseSwaggerUI();
 		}
 
-		app.RunAsync(); // Run application asynchronously to exit scope
+		app.Run(); // Run application
 	}
 
 	// @ ----------------------------------------------------------------------------------------------------<
