@@ -1,0 +1,46 @@
+version: '1.0'
+
+services:
+  market-price-api:
+    container_name: market-price-api
+    hostname: market-price-api
+
+    image: market-price-api:latest
+
+    env_file:
+      - .env
+    networks:
+      - market-price-net
+    depends_on:
+      - market-price-mdb
+    ports:
+      - "23000:8080"
+
+  market-price-mdb:
+    container_name: market-price-mdb
+    hostname: market-price-mdb
+
+    command: mongod --auth
+    image: mongo:latest
+
+    networks:
+      - market-price-net
+    ports:
+      - "24000:27017"
+    volumes:
+      - "market-price-vol:/data/db"
+
+networks:
+  market-price-net:
+    name: market-price-net
+    driver: bridge
+
+volumes:
+  market-price-vol:
+    name: market-price-vol
+    driver: local
+
+    driver_opts:
+      type: none
+      device: ./mongodb
+      o: bind

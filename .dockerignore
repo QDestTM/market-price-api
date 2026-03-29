@@ -1,0 +1,29 @@
+# Output ingores
+**/bin/
+**/obj/
+
+# VSCode ignores
+.vscode/**
+
+# Obsidian ignores
+.obsidian/**
+
+# MongoDB ignores
+mongodb/**
+
+# Docker ignores
+docker-compose.yaml
+
+# Git ignores
+.gitattributes
+.gitignore
+.git/**
+
+# Other files
+launchSettings.json
+.editorconfig
+.env.example
+*.rar
+*.zip
+*.pdf
+*.md
