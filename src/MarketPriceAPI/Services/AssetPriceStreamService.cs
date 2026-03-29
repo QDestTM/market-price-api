@@ -62,6 +62,8 @@ public sealed class AssetPriceStreamService : BackgroundService, IAssetPriceStre
 			var uri = await GetSocketConnectionUri(stoppingToken);
 			await socket.ConnectAsync(uri, stoppingToken);
 
+			logger.LogInformation("WebSocket is successfully connected.");
+
 			// Restore all active subscriptions after reconnect
 			await RestoreSubscriptionsAsync(stoppingToken);
 
