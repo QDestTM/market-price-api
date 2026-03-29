@@ -25,6 +25,7 @@ public sealed class TokenService : ITokenService
 	private readonly IOptions<AuthOptions> authOptions;
 	private readonly HttpClient httpClient;
 
+	private readonly SemaphoreSlim tokenLock = new(1, 1);
 	private TokenEntry? tokenEntry = null;
 
 	// Public instance constructors
@@ -42,23 +43,10 @@ public sealed class TokenService : ITokenService
 
 	public async Task<string> GetAccessTokenAsync(CancellationToken ct)
 	{
-		tokenEntry ??= await marketDatabase.GetTokenEntryOrNullAsync(ct);
+		await tokenLock.WaitAsync(ct);
 
-		// Check if there is no token or refresh token has expired, request a new access token
-		if ( tokenEntry is null || tokenEntry.RefreshExpiresAt < DateTime.UtcNow )
-		{
-			var respond = await RequestAccessTokenAsync(ct);
-			await UpdateTokenEntryFromResponseAsync(respond, ct);
-		}
-
-		// Check if access token has expired, refresh it using the refresh token
-		if ( tokenEntry.AccessExpiresAt < DateTime.UtcNow )
-		{
-			var respond = await RefreshAccessTokenAsync(ct);
-			await UpdateTokenEntryFromResponseAsync(respond, ct);
-		}
-
-		return tokenEntry.AccessToken;
+		var token = await GetAccessTokenSafeAsync(ct);
+		tokenLock.Release(); return token;
 	}
 
 	// ------------------------------------------------------------------------------------------------------<
@@ -84,6 +72,28 @@ public sealed class TokenService : ITokenService
 
 		// Save or update token entry in the database
 		await marketDatabase.SetTokenEntryAsync(tokenEntry, ct);
+	}
+
+
+	private async Task<string> GetAccessTokenSafeAsync(CancellationToken ct)
+	{
+		tokenEntry ??= await marketDatabase.GetTokenEntryOrNullAsync(ct);
+
+		// Check if there is no token or refresh token has expired, request a new access token
+		if ( tokenEntry is null || tokenEntry.RefreshExpiresAt < DateTime.UtcNow )
+		{
+			var respond = await RequestAccessTokenAsync(ct);
+			await UpdateTokenEntryFromResponseAsync(respond, ct);
+		}
+
+		// Check if access token has expired, refresh it using the refresh token
+		if ( tokenEntry.AccessExpiresAt < DateTime.UtcNow )
+		{
+			var respond = await RefreshAccessTokenAsync(ct);
+			await UpdateTokenEntryFromResponseAsync(respond, ct);
+		}
+
+		return tokenEntry.AccessToken;
 	}
 
 	// ------------------------------------------------------------------------------------------------------<
