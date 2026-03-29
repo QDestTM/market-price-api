@@ -81,6 +81,8 @@ public sealed class AssetRefreshService : BackgroundService
 		// Check if refresh is needed based on stored marker
 		if ( refreshMarker is null || refreshMarker.RefreshAt < DateTime.UtcNow )
 		{
+			await metadataService.InitializationTask; // Wait until metadata is fully initialized
+
 			// Iterate through all providers and kinds to refresh assets
 			foreach ( string provider in metadataService.Providers )
 			{

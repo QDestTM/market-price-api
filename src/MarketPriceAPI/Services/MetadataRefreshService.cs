@@ -28,7 +28,12 @@ public sealed class MetadataRefreshService : BackgroundService, IMetadataService
 	public IReadOnlySet<string> Providers => metadataEntry!.Providers;
 	public IReadOnlySet<string> Kinds => metadataEntry!.Kinds;
 
+	public Task InitializationTask => initTaskSource.Task;
+
 	//! Private instance members
+	private readonly TaskCompletionSource<bool> initTaskSource
+		= new(TaskCreationOptions.RunContinuationsAsynchronously);
+
 	private readonly ILogger<MetadataRefreshService> logger;
 	private readonly IMarketDatabaseContext marketDatabase;
 	private readonly ITokenService tokenService;
@@ -97,6 +102,9 @@ public sealed class MetadataRefreshService : BackgroundService, IMetadataService
 		{
 			logger.LogInformation("Assets metadata is up to date. No refresh needed.");
 		}
+
+		// Signal that metadata is available (initialized or loaded from DB)
+		initTaskSource.TrySetResult(true);
 	}
 
 	// ------------------------------------------------------------------------------------------------------<
