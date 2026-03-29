@@ -135,16 +135,16 @@ public sealed class AssetPriceStreamService : BackgroundService, IAssetPriceStre
 			try
 			{
 				string responseText = Encoding.UTF8.GetString(buffer, 0, response.Count);
-				JsonDocument document = JsonDocument.Parse(responseText);
+				using JsonDocument json = JsonDocument.Parse(responseText);
 
 				// Determine message type for further processing
-				string? messageType = document.RootElement.GetProperty("type").GetString();
+				string? messageType = json.RootElement.GetProperty("type").GetString();
 				if ( messageType is null ) continue;
 
 				// Handle price update message and update cache
 				if ( messageType == "l1-update" )
 				{
-					var assetPrice = document.RootElement.Deserialize<AssetPrice>();
+					var assetPrice = json.RootElement.Deserialize<AssetPrice>();
 					ArgumentNullException.ThrowIfNull(assetPrice, nameof(assetPrice));
 
 					// Update cache and evict old entries if needed

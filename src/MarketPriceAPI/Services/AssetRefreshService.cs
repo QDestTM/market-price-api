@@ -120,7 +120,7 @@ public sealed class AssetRefreshService : BackgroundService
 			// Create HTTP GET request with authorization token
 			var token = await tokenService.GetAccessTokenAsync(ct);
 
-			var request = new HttpRequestMessage(HttpMethod.Get, UriBase
+			using var request = new HttpRequestMessage(HttpMethod.Get, UriBase
 				+ $"?provider={provider}&kind={kind}&page={page}&size={AssetsPageSize}");
 
 			// Set Authorization header with bearer token for request
@@ -128,7 +128,7 @@ public sealed class AssetRefreshService : BackgroundService
 			request.Headers.Authorization = authenticationHeader;
 
 			// Send the request to the API and get the response
-			var response = await httpClient.SendAsync(request, ct);
+			using var response = await httpClient.SendAsync(request, ct);
 
 			if ( response.StatusCode == HttpStatusCode.Unauthorized )
 			{

@@ -126,13 +126,13 @@ public sealed class TokenService : ITokenService
 			"identity/realms/fintatech/protocol/openid-connect/token";
 
 		// Create an HTTP POST request with form URL-encoded body
-		var request = new HttpRequestMessage(HttpMethod.Post, requestUri)
+		using var request = new HttpRequestMessage(HttpMethod.Post, requestUri)
 		{
 			Content = new FormUrlEncodedContent(body)
 		};
 
 		// Send the HTTP request and ensure a successful response
-		var response = await httpClient.SendAsync(request, ct);
+		using var response = await httpClient.SendAsync(request, ct);
 		response.EnsureSuccessStatusCode();
 
 		// Read response content and deserialize it into TokenRespond

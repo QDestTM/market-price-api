@@ -87,14 +87,14 @@ public sealed class MetadataRefreshService : BackgroundService, IMetadataService
 	private async Task<IEnumerable<string>> ExtractDataFromUri(string requestUri, CancellationToken ct)
 	{
 		var token = await tokenService.GetAccessTokenAsync(ct);
-		var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+		using var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
 
 		// Set Authorization header with bearer token for request
 		var authenticationHeader = new AuthenticationHeaderValue("Bearer", token);
 		request.Headers.Authorization = authenticationHeader;
 
 		// Send request via http client and wait for the response
-		var respond = await httpClient.SendAsync(request, ct);
+		using var respond = await httpClient.SendAsync(request, ct);
 		respond.EnsureSuccessStatusCode();
 
 		// Read response stream and parse JSON document
