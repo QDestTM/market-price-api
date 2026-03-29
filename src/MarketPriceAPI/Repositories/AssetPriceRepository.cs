@@ -45,7 +45,7 @@ public sealed class AssetPriceRepository : IAssetPriceRepository
 		if ( cachedPrice is null )
 		{
 			await assetPriceStream.SubscribeToStreamAsync(id, provider, ct);
-			await Task.Delay(300, cancellationToken: ct);
+			await Task.Delay(2000, cancellationToken: ct);
 		}
 
 		// Return the latest cached price (may still be null if not received yet)
