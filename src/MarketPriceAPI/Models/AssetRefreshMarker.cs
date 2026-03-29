@@ -17,7 +17,7 @@ public sealed class AssetRefreshMarker
 
 	[BsonElement("refresh_at")]
 	[BsonDateTimeOptions(Kind=DateTimeKind.Utc)]
-	public DateTime RefreshAt { get; set; } = DateTime.UtcNow;
+	public DateTime RefreshAt { get; set; } = DateTime.MinValue;
 
 	// ------------------------------------------------------------------------------------------------------<
 }
