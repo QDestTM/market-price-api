@@ -9,6 +9,7 @@ using System.Threading;
 using System.Text.Json;
 using System.Net.Http;
 using System.Linq;
+using System.Net;
 using System;
 
 // Main content of the file
@@ -43,15 +44,15 @@ public sealed class PriceHistoryService : IPriceHistoryService
 
 	public async Task<PriceHistoryResponse> Fetch(PriceHistoryRequest request, CancellationToken ct)
 	{
-		var respond = new PriceHistoryResponse()
+		var response = new PriceHistoryResponse()
 		{
 			Error = await ValidateRequestAsync(request, ct)
 		};
 
 		// Return early if request validation failed
-		if ( !string.IsNullOrEmpty(respond.Error) )
+		if ( !string.IsNullOrEmpty(response.Error) )
 		{
-			return respond;
+			return response;
 		}
 
 		// Retrieve access token for API authentication and prerape GET request
@@ -70,11 +71,18 @@ public sealed class PriceHistoryService : IPriceHistoryService
 		requestMessage.Headers.Authorization = authenticationHeader;
 
 		// Send HTTP request and get response from API
-		using var respondMessage = await httpClient.SendAsync(requestMessage, ct);
-		respondMessage.EnsureSuccessStatusCode();
+		using var responseMessage = await httpClient.SendAsync(requestMessage, ct);
+
+		if ( responseMessage.StatusCode == HttpStatusCode.InternalServerError )
+		{
+			response.Error = "An error occurred while requesting data from the external service.";
+			return response;
+		}
+
+		responseMessage.EnsureSuccessStatusCode();
 
 		// Read response content as stream and parse JSON
-		using var respondStream = await respondMessage.Content.ReadAsStreamAsync(ct);
+		using var respondStream = await responseMessage.Content.ReadAsStreamAsync(ct);
 		using var json = await JsonDocument.ParseAsync(respondStream, default, ct);
 
 		// Extract price history records from JSON data
@@ -96,8 +104,8 @@ public sealed class PriceHistoryService : IPriceHistoryService
 			.ToList();
 
 		// Assign extracted records to response
-		respond.Data = records;
-		return respond;
+		response.Data = records;
+		return response;
 	}
 
 	// ------------------------------------------------------------------------------------------------------<
