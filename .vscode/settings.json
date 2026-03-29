@@ -106,6 +106,26 @@
 			"folderPath": "README.md\\",
 			"color": "foldercolorizer.color_cccc66",
 			"badge": "༶"
+		},
+		{
+			"folderPath": "mongodb_empty.rar\\",
+			"color": "foldercolorizer.color_cccc99",
+			"badge": "⍽"
+		},
+		{
+			"folderPath": "mongodb_empty.zip\\",
+			"color": "foldercolorizer.color_cccc99",
+			"badge": "⍽"
+		},
+		{
+			"folderPath": "mongodb_snapshot.rar\\",
+			"color": "foldercolorizer.color_cccc99",
+			"badge": "⍽"
+		},
+		{
+			"folderPath": "mongodb_snapshot.zip\\",
+			"color": "foldercolorizer.color_cccc99",
+			"badge": "⍽"
 		}
 	]
 }
