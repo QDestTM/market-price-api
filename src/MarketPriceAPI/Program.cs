@@ -48,8 +48,13 @@ public static class Program
 		if ( app.Environment.IsDevelopment() )
 		{
 			app.MapOpenApi();
+		}
 
-			// Enable Swagger middleware for API documentation
+		// Enable Swagger middleware for API documentation
+		bool forceSwagger = app.Configuration.GetValue<bool>("FORCE_SWAGGER");
+
+		if ( app.Environment.IsDevelopment() || forceSwagger )
+		{
 			app.UseSwagger();
 			app.UseSwaggerUI();
 		}
