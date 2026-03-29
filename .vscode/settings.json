@@ -126,6 +126,11 @@
 			"folderPath": "mongodb_snapshot.zip\\",
 			"color": "foldercolorizer.color_cccc99",
 			"badge": "⍽"
+		},
+		{
+			"folderPath": "LICENSE.md\\",
+			"color": "foldercolorizer.color_ffcc33",
+			"badge": "⌥"
 		}
 	]
 }
