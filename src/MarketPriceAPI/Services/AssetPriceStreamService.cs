@@ -169,8 +169,19 @@ public sealed class AssetPriceStreamService : BackgroundService, IAssetPriceStre
 	{
 		while ( !ct.IsCancellationRequested && socket.State == WebSocketState.Open )
 		{
-			await SendSocketMessageAsync(PingMessage, ct);
-			await Task.Delay(KeepAliveInterval, ct);
+			try
+			{
+				await SendSocketMessageAsync(PingMessage, ct);
+				await Task.Delay(KeepAliveInterval, ct);
+			}
+			catch ( OperationCanceledException )
+			{
+				// Expected when the task is cancelled
+			}
+			catch ( Exception exception )
+			{
+				logger.LogError(exception, "Error occurred in keep-alive loop.");
+			}
 		}
 	}
 
@@ -179,22 +190,33 @@ public sealed class AssetPriceStreamService : BackgroundService, IAssetPriceStre
 	{
 		while ( !ct.IsCancellationRequested && socket.State == WebSocketState.Open )
 		{
-			DateTime utcNow = DateTime.UtcNow;
-
-			// Iterate through cached prices and unsubscribe expired entries
-			foreach ( var price in priceCache.GetAllCached() )
+			try
 			{
-				if ( utcNow - price.LastUpdated > CacheExpireInterval )
+				DateTime utcNow = DateTime.UtcNow;
+
+				// Iterate through cached prices and unsubscribe expired entries
+				foreach ( var price in priceCache.GetAllCached() )
 				{
-					var command = new StreamSubscriptionCommand(price, false);
+					if ( utcNow - price.LastUpdated > CacheExpireInterval )
+					{
+						var command = new StreamSubscriptionCommand(price, false);
 
-					priceCache.ExpireCached(command.Id, command.Provider);
-					await SendSubscriptionCommand(command, ct);
+						priceCache.ExpireCached(command.Id, command.Provider);
+						await SendSubscriptionCommand(command, ct);
+					}
 				}
-			}
 
-			// Wait before next cache cleanup iteration
-			await Task.Delay(CacheCleanupInterval, ct);
+				// Wait before next cache cleanup iteration
+				await Task.Delay(CacheCleanupInterval, ct);
+			}
+			catch ( OperationCanceledException )
+			{
+				// Expected when the task is cancelled
+			}
+			catch ( Exception exception )
+			{
+				logger.LogError(exception, "Error occurred in cache cleanup loop.");
+			}
 		}
 	}
 
@@ -212,14 +234,16 @@ public sealed class AssetPriceStreamService : BackgroundService, IAssetPriceStre
 
 	private async Task SendSubscriptionCommand(StreamSubscriptionCommand command, CancellationToken ct)
 	{
-		var message = Encoding.UTF8.GetBytes("{"
-					+ "\"type\":\"l1-subscription\","
-					+ $"\"instrumentId\":\"{command.Id}\","
-					+ $"\"provider\":\"{command.Provider}\","
-					+ $"\"subscribe\":{command.Subscribe},"
-					+ "\"kinds\":[\"ask\", \"bid\", \"last\"]"
-					+ "}");
+		var payload = new
+		{
+			type         = "l1-subscription",
+			instrumentId = command.Id,
+			provider     = command.Provider,
+			subscribe    = command.Subscribe,
+			kinds        = new[] { "ask", "bid", "last" }
+		};
 
+		var message = Encoding.UTF8.GetBytes( JsonSerializer.Serialize(payload) );
 		await SendSocketMessageAsync(message, ct);
 	}
 
