@@ -21,7 +21,7 @@ public sealed class GetPriceEndpoint : IEndpointDefinition
 	public void Map(IEndpointRouteBuilder builder)
 	{
 		builder.MapGet(Endpoint, GetPriceAsync)
-			.Produces<GetPriceRespond>(StatusCodes.Status200OK)
+			.Produces<GetPriceResponse>(StatusCodes.Status200OK)
 			.Produces(StatusCodes.Status404NotFound)
 			.MapToApiVersion(1.0);
 	}
@@ -45,8 +45,8 @@ public sealed class GetPriceEndpoint : IEndpointDefinition
 		}
 
 		// Return HTTP 200 OK with the response payload
-		var respond = new GetPriceRespond(assetPrice);
-		return Results.Ok(respond);
+		var response = new GetPriceResponse(assetPrice);
+		return Results.Ok(response);
 	}
 
 	// ------------------------------------------------------------------------------------------------------<

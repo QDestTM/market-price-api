@@ -26,7 +26,7 @@ public sealed class GetAssetsEndpoint : IEndpointDefinition
 	{
 		builder.MapGet(Endpoint, GetAssetsAsync)
 			.Produces<EndpointErrorResponse>(StatusCodes.Status400BadRequest)
-			.Produces<GetAssetsRespond>(StatusCodes.Status200OK)
+			.Produces<GetAssetsResponse>(StatusCodes.Status200OK)
 			.MapToApiVersion(1.0);
 	}
 
@@ -38,7 +38,7 @@ public sealed class GetAssetsEndpoint : IEndpointDefinition
 		[AsParameters] GetAssetsQuery query,
 		HttpContext httpContext, CancellationToken ct)
 	{
-		var options = QueryOptionsFromEndpointQuery(query);
+		var options = OptionsFromQuery(query);
 
 		// Execute assets query with applied filters and pagination
 		var queryResult = await assetRepository.QueryAssetsAsync(options);
@@ -49,13 +49,13 @@ public sealed class GetAssetsEndpoint : IEndpointDefinition
 			return Results.BadRequest(errorResponse);
 		}
 
-		var respond = new GetAssetsRespond([..queryResult.Items], queryResult.Paging);
-		return Results.Ok(respond); // Return HTTP 200 OK with the response payload
+		var response = new GetAssetsResponse([..queryResult.Items], queryResult.Paging);
+		return Results.Ok(response); // Return HTTP 200 OK with the response payload
 	}
 
 	// ------------------------------------------------------------------------------------------------------<
 
-	private static QueryAssetsOptions QueryOptionsFromEndpointQuery(GetAssetsQuery query)
+	private static QueryAssetsOptions OptionsFromQuery(GetAssetsQuery query)
 	{
 		return new QueryAssetsOptions()
 		{

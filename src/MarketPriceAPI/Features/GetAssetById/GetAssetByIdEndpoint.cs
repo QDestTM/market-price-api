@@ -21,7 +21,7 @@ public sealed class GetAssetByIdEndpoint : IEndpointDefinition
 	public void Map(IEndpointRouteBuilder builder)
 	{
 		builder.MapGet(Endpoint, GetAssetByIdAsync)
-			.Produces<GetAssetByIdRespond>(StatusCodes.Status200OK)
+			.Produces<GetAssetByIdResponse>(StatusCodes.Status200OK)
 			.Produces(StatusCodes.Status404NotFound)
 			.MapToApiVersion(1.0);
 	}
@@ -43,8 +43,8 @@ public sealed class GetAssetByIdEndpoint : IEndpointDefinition
 		}
 
 		// Return HTTP 200 OK with the response payload
-		var respond = new GetAssetByIdRespond(asset);
-		return Results.Ok(respond);
+		var response = new GetAssetByIdResponse(asset);
+		return Results.Ok(response);
 	}
 
 	// ------------------------------------------------------------------------------------------------------<

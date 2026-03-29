@@ -16,7 +16,7 @@ using System;
 public sealed class PriceHistoryService : IPriceHistoryService
 {
 	public const string UriBase = "https://platform.fintacharts.com/api/bars/v1/bars/date-range";
-	public const int RespondMaxRecords = 128;
+	public const int ResponseMaxRecords = 128;
 
 	// ^ ----------------------------------------------------------------------------------------------------<
 
@@ -82,8 +82,8 @@ public sealed class PriceHistoryService : IPriceHistoryService
 		responseMessage.EnsureSuccessStatusCode();
 
 		// Read response content as stream and parse JSON
-		using var respondStream = await responseMessage.Content.ReadAsStreamAsync(ct);
-		using var json = await JsonDocument.ParseAsync(respondStream, default, ct);
+		using var responseStream = await responseMessage.Content.ReadAsStreamAsync(ct);
+		using var json = await JsonDocument.ParseAsync(responseStream, default, ct);
 
 		// Extract price history records from JSON data
 		var records = json.RootElement
@@ -149,7 +149,7 @@ public sealed class PriceHistoryService : IPriceHistoryService
 		// Estimate number of records to be returned and enforce maximum record limit
 		var estimatedRecords = (int) Math.Ceiling(totalUnits.Value / request.Interval);
 
-		if ( estimatedRecords > RespondMaxRecords )
+		if ( estimatedRecords > ResponseMaxRecords )
 		{
 			return "Too many records requested.";
 		}

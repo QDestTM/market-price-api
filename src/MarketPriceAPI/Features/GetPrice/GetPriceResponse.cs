@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 using MarketPriceAPI.Models;
 
 // Main content of the file
-public sealed record GetPriceRespond
+public sealed record GetPriceResponse
 (
 	// ^ ----------------------------------------------------------------------------------------------------<
 

@@ -1,16 +1,20 @@
-namespace MarketPriceAPI.Features.GetAssetById;
+namespace MarketPriceAPI.Features.GetAssets;
 
 // Namespaces used by this file
 using System.Text.Json.Serialization;
+using System.Collections.Generic;
 using MarketPriceAPI.Models;
 
 // Main content of the file
-public sealed record GetAssetByIdRespond
+public sealed record GetAssetsResponse
 (
 	// ^ ----------------------------------------------------------------------------------------------------<
 
-	[property: JsonPropertyName("data")]
-	MarketAsset Data
+	[property: JsonPropertyName("items")]
+	List<MarketAsset> Items,
+
+	[property: JsonPropertyName("pages")]
+	PagingInfo Paging
 
 	// ------------------------------------------------------------------------------------------------------<
 );

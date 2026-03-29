@@ -82,15 +82,15 @@ public sealed class TokenService : ITokenService
 		// Check if there is no token or refresh token has expired, request a new access token
 		if ( tokenEntry is null || tokenEntry.RefreshExpiresAt < DateTime.UtcNow )
 		{
-			var respond = await RequestAccessTokenAsync(ct);
-			await UpdateTokenEntryFromResponseAsync(respond, ct);
+			var response = await RequestAccessTokenAsync(ct);
+			await UpdateTokenEntryFromResponseAsync(response, ct);
 		}
 
 		// Check if access token has expired, refresh it using the refresh token
 		if ( tokenEntry.AccessExpiresAt < DateTime.UtcNow )
 		{
-			var respond = await RefreshAccessTokenAsync(ct);
-			await UpdateTokenEntryFromResponseAsync(respond, ct);
+			var response = await RefreshAccessTokenAsync(ct);
+			await UpdateTokenEntryFromResponseAsync(response, ct);
 		}
 
 		return tokenEntry.AccessToken;
@@ -145,7 +145,7 @@ public sealed class TokenService : ITokenService
 		using var response = await httpClient.SendAsync(request, ct);
 		response.EnsureSuccessStatusCode();
 
-		// Read response content and deserialize it into TokenRespond
+		// Read response content and deserialize it into TokenResponse
 		var json = await response.Content.ReadAsStringAsync(ct);
 		return JsonSerializer.Deserialize<TokenResponse>(json)!;
 	}

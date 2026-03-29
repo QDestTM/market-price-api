@@ -131,11 +131,11 @@ public sealed class MetadataRefreshService : BackgroundService, IMetadataService
 		request.Headers.Authorization = authenticationHeader;
 
 		// Send request via http client and wait for the response
-		using var respond = await httpClient.SendAsync(request, ct);
-		respond.EnsureSuccessStatusCode();
+		using var response = await httpClient.SendAsync(request, ct);
+		response.EnsureSuccessStatusCode();
 
 		// Read response stream and parse JSON document
-		using var stream = await respond.Content.ReadAsStreamAsync(ct);
+		using var stream = await response.Content.ReadAsStreamAsync(ct);
 		using var json = await JsonDocument.ParseAsync(stream, default, ct);
 
 		// Extract "data" array from JSON and return as string array
