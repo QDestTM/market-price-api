@@ -52,12 +52,10 @@ public sealed class MetadataRefreshService : BackgroundService, IMetadataService
 			try
 			{
 				logger.LogInformation("Starting refresh of asset providers...");
-				var providersEnum = await GetProvidersAsync(stoppingToken);
-				providers = providersEnum.ToHashSet()!;
+				providers = await GetProvidersAsync(stoppingToken);
 
 				logger.LogInformation("Starting refresh of asset kinds...");
-				var kindsEnum = await GetKindsAsync(stoppingToken);
-				kinds = kindsEnum.ToHashSet()!;
+				kinds = await GetKindsAsync(stoppingToken);
 
 				logger.LogInformation("Asset providers and kinds succesfully refreshed.");
 			}
@@ -72,19 +70,19 @@ public sealed class MetadataRefreshService : BackgroundService, IMetadataService
 
 	// @ ----------------------------------------------------------------------------------------------------<
 
-	private async Task<IEnumerable<string>> GetProvidersAsync(CancellationToken ct)
+	private async Task<HashSet<string>> GetProvidersAsync(CancellationToken ct)
 	{
 		return await ExtractDataFromUri(UriBase + "/providers", ct);
 	}
 
 
-	private async Task<IEnumerable<string>> GetKindsAsync(CancellationToken ct)
+	private async Task<HashSet<string>> GetKindsAsync(CancellationToken ct)
 	{
 		return await ExtractDataFromUri(UriBase + "/kinds", ct);
 	}
 
 
-	private async Task<IEnumerable<string>> ExtractDataFromUri(string requestUri, CancellationToken ct)
+	private async Task<HashSet<string>> ExtractDataFromUri(string requestUri, CancellationToken ct)
 	{
 		var token = await tokenService.GetAccessTokenAsync(ct);
 		using var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
@@ -106,7 +104,8 @@ public sealed class MetadataRefreshService : BackgroundService, IMetadataService
 			.GetProperty("data")
 			.EnumerateArray()
 			.Select(x => x.GetString())
-			.Where(x => x is not null)!;
+			.Where(x => x is not null)
+			.ToHashSet()!;
 	}
 
 	// ------------------------------------------------------------------------------------------------------<
