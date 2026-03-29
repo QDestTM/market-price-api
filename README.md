@@ -2,9 +2,7 @@
 
 ## Overview
 
-**Market Price API** is a RESTful service designed to provide access to financial information, including assets, real-time prices from various providers, and historical price data. The project is implemented using **ASP.NET** with **.NET SDK 10.0** and leverages the [Fintatech API](https://fintatech.com/) for fetching both REST and real-time price updates. **MongoDB** is used for storing and caching asset data to ensure fast access.
-
----
+**Market Price API** is a RESTful service designed to provide access to financial information, including assets, real-time prices from various providers, and historical price data. The project is implemented using **ASP.NET** with **.NET SDK 10.0** and leverages the [Fintacharts API](https://fintatech.com/) for fetching both REST and real-time price updates. **MongoDB** is used for storing and caching asset data to ensure fast access.
 
 ## Quick Start
 
@@ -14,13 +12,13 @@ Prerequisites: Command Line Interface (CLI), Git , Docker
 1. **Clone the repository**:
 
 ```bash
-git clone https://github.com/qdesttm/market-price-api.git
+git clone https://github.com/QDestTM/market-price-api.git
 cd market-price-api
 ```
 
 2. **Download MongoDB snapshot**:
 
-From the [releases tab], download either `mongodb_empty.zip` or `mongodb_empty.rar`. Extract the contents into the project root. A folder named `mongodb` should appear. This snapshot contains pre-configured collections and users for fast setup. For manual setup, see the "Manual MongoDB Setup" section.
+From the [Releases tab](https://github.com/qdesttm/market-price-api/releases), download either `mongodb_empty.zip` or `mongodb_empty.rar`. Extract the contents into the project root. A folder named `mongodb` should appear. This snapshot contains pre-configured collections and users for fast setup. For manual setup, see the "Manual MongoDB Setup" section.
 
 3. **Configure `.env` file**:
 
@@ -36,9 +34,9 @@ MONGODB_PASSWORD="api-yvt9-ap"
 FORCE_SWAGGER=true
 ```
 
-+ ⚠️ MongoDB credentials must match the snapshot or your custom setup.
-+ ⚠️ Obtain test credentials for **Fintacharts API** independently.
-+ ℹ `FORCE_SWAGGER=true` enables Swagger for easy API testing.
+> ⚠️ MongoDB credentials must match the snapshot or your custom setup.<br/>
+> ⚠️ Obtain test credentials for **Fintacharts API** independently.<br/>
+> ℹ `FORCE_SWAGGER=true` enables Swagger for easy API testing.<br/>
 
 4. **Build the Docker image**:
 
@@ -61,11 +59,9 @@ docker-compose up
 
 > ⚠️ On the first run with an empty database, some resources may be temporarily unavailable while the server fetches and stores asset data via the API. Please allow a short wait.
 
----
-
 ## Manual MongoDB Setup
 
-> Requires MongoDB shell access. Ensure the server is started with `--noauth` for unauthenticated access.
+> ℹ Requires MongoDB shell access. Ensure the server is started with `--noauth` for unauthenticated access.
 
 ### Create database and collections:
 
@@ -92,8 +88,6 @@ db.createUser({
 
 Replace `<MONGODB_USERNAME>` and `<MONGODB_PASSWORD>` with the corresponding values from your `.env` file. If you are setting up MongoDB manually, these variables should match what you define in `.env`.
 
----
-
 ## Using Visual Studio Code
 
 The project includes full Visual Studio Code configuration for debugging:
@@ -105,8 +99,6 @@ The project includes full Visual Studio Code configuration for debugging:
 
 Press **F5** to start debugging after MongoDB is running locally or via Docker. The pre-build task `build-market-price-api` ensures the project is compiled before launch.
 
----
-
 ## Swagger Activation in Production
 
 The `.env` variable `FORCE_SWAGGER` allows forcing Swagger UI activation:
@@ -114,9 +106,7 @@ The `.env` variable `FORCE_SWAGGER` allows forcing Swagger UI activation:
 - **Development Mode**: Swagger is enabled by default.
 - **Production Mode**: Swagger is disabled by default, unless `FORCE_SWAGGER=true`.
 
-> Swagger UI is accessible at `/swagger`.
-
----
+> ℹ Swagger UI is accessible at `/swagger`.
 
 ## API Endpoints
 
@@ -124,7 +114,7 @@ The `.env` variable `FORCE_SWAGGER` allows forcing Swagger UI activation:
 
 **Get single asset by ID**:
 
-`GET /api/v1/assets/{asset_id:guid}`
+`➡ GET /api/v1/assets/{asset_id:guid}`
 
 Sample response:
 
@@ -145,7 +135,7 @@ Sample response:
 
 **Get assets list with pagination and filtering**:
 
-`GET /api/v1/assets`
+`➡ GET /api/v1/assets`
 
 | Parameter | Type     | Description        |
 | --------- | -------- | ------------------ |
@@ -178,16 +168,14 @@ Sample response:
 }
 ```
 
----
-
 ### Prices
 
 **Get real-time price**:
 
-`GET /api/v1/prices/{provider:string}/{asset_id:guid}`
+`➡ GET /api/v1/prices/{provider:string}/{asset_id:guid}`
 
-> ⚠️ This endpoint may be unstable and can occasionally produce unexpected errors.
-> ℹ Returns `404` if data is not available or has not yet been updated. In most cases, a repeated request will return the data.
+> ⚠️ This endpoint may be unstable and can occasionally produce unexpected errors.<br/>
+> ℹ Returns `404` if data is not available or has not yet been updated. In most cases, a repeated request will return the data.<br/>
 
 Sample response:
 
@@ -212,7 +200,7 @@ Sample response:
 
 **Get historical prices**:
 
-`GET /api/v1/prices/history`
+`➡ GET /api/v1/prices/history`
 
 | Parameter       | Type       | Description                                     |
 | --------------- | ---------- | ----------------------------------------------- |
