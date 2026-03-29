@@ -50,8 +50,9 @@ public sealed class MarketAssetRepository : IMarketAssetRepository
 
 		if ( !string.IsNullOrEmpty(options.Symbol) )
 		{
-			assetsQuery = assetsQuery.Where(a => a.Symbol
-				.Contains(options.Symbol, StringComparison.OrdinalIgnoreCase));
+			#pragma warning disable CA1862 // StringComparison.OrdinalIgnoreCase is unsuppored operation
+			assetsQuery = assetsQuery.Where(a => a.Symbol.Contains(options.Symbol.ToUpper()));
+			#pragma warning restore CA1862 // StringComparison.OrdinalIgnoreCase is unsuppored operation
 		}
 
 		// Order the query by Id descending to get consistent sequences
