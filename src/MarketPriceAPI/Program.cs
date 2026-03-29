@@ -70,7 +70,6 @@ public static class Program
 
 			options.MongoDbUsername = configuration.GetValue("MONGODB_USERNAME", string.Empty);
 			options.MongoDbPassword = configuration.GetValue("MONGODB_PASSWORD", string.Empty);
-
 		})
 			.ValidateDataAnnotations()
 			.ValidateOnStart();
@@ -79,9 +78,17 @@ public static class Program
 
 	private static void ConfigureHostedServices(this WebApplicationBuilder builder)
 	{
-		builder.Services.AddHostedService<AssetPriceStreamService>();
-		builder.Services.AddHostedService<MetadataRefreshService>();
 		builder.Services.AddHostedService<AssetRefreshService>();
+
+		// Register hosted services as singletons for DI access
+		builder.Services.AddSingleton<AssetPriceStreamService>();
+		builder.Services.AddSingleton<MetadataRefreshService>();
+
+		// Use the existing singleton instances as hosted services
+		builder.Services.AddHostedService(
+			sp => sp.GetRequiredService<AssetPriceStreamService>());
+		builder.Services.AddHostedService(
+			sp => sp.GetRequiredService<MetadataRefreshService>());
 	}
 
 
