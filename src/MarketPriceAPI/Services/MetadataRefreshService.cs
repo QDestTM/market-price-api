@@ -6,6 +6,8 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using MarketPriceAPI.Models;
+using MarketPriceAPI.Data;
 using System.Threading;
 using System.Text.Json;
 using System.Net.Http;
@@ -16,28 +18,32 @@ using System;
 public sealed class MetadataRefreshService : BackgroundService, IMetadataService
 {
 	public const string UriBase = "https://platform.fintacharts.com/api/instruments/v1";
-	public readonly TimeSpan RefreshInterval = TimeSpan.FromDays(1.5);
+
+	public readonly TimeSpan RefreshTriesInterval = TimeSpan.FromMinutes(3);
+	public readonly TimeSpan MetadataExpiresAt = TimeSpan.FromDays(1.5);
 
 	// ^ ----------------------------------------------------------------------------------------------------<
 
 	// Public instance readonly properties
-	public IReadOnlySet<string> Providers => providers;
-	public IReadOnlySet<string> Kinds => kinds;
+	public IReadOnlySet<string> Providers => metadataEntry!.Providers;
+	public IReadOnlySet<string> Kinds => metadataEntry!.Kinds;
 
 	//! Private instance members
 	private readonly ILogger<MetadataRefreshService> logger;
+	private readonly IMarketDatabaseContext marketDatabase;
 	private readonly ITokenService tokenService;
 	private readonly HttpClient httpClient;
 
-	private HashSet<string> providers = [];
-	private HashSet<string> kinds = [];
+	private MetadataEntry? metadataEntry = null;
 
 	// Public instance constructors
 	public MetadataRefreshService(
 		ILogger<MetadataRefreshService> logger,
+		IMarketDatabaseContext marketDatabase,
 		ITokenService tokenService,
 		HttpClient httpClient) : base()
 	{
+		this.marketDatabase = marketDatabase;
 		this.tokenService = tokenService;
 		this.httpClient = httpClient;
 		this.logger = logger;
@@ -51,24 +57,49 @@ public sealed class MetadataRefreshService : BackgroundService, IMetadataService
 		{
 			try
 			{
-				logger.LogInformation("Starting refresh of asset providers...");
-				providers = await GetProvidersAsync(stoppingToken);
-
-				logger.LogInformation("Starting refresh of asset kinds...");
-				kinds = await GetKindsAsync(stoppingToken);
-
-				logger.LogInformation("Asset providers and kinds succesfully refreshed.");
+				logger.LogInformation("Refreshing assets metadata...");
+				await RefreshMetadata(stoppingToken);
 			}
 			catch ( Exception exception )
 			{
 				logger.LogError(exception, "Error occurred while refreshing assets metadata.");
 			}
 
-			await Task.Delay(RefreshInterval, stoppingToken);
+			await Task.Delay(RefreshTriesInterval, stoppingToken);
 		}
 	}
 
 	// @ ----------------------------------------------------------------------------------------------------<
+
+	private async Task RefreshMetadata(CancellationToken ct)
+	{
+		metadataEntry ??= await marketDatabase.GetMetadataEntryOrNullAsync(ct);
+
+		// Determine whether metadata needs to be refreshed (missing or expired)
+		if ( metadataEntry is null || metadataEntry.RefreshAt < DateTime.UtcNow )
+		{
+			var providers = await GetProvidersAsync(ct);
+			var kinds     = await GetKindsAsync(ct);
+
+			// Create and persist a new metadata entry with updated values and expiration
+			metadataEntry = new MetadataEntry()
+			{
+				Providers = providers,
+				Kinds = kinds,
+
+				RefreshAt = DateTime.UtcNow + MetadataExpiresAt
+			};
+
+			await marketDatabase.SetMetadataEntryAsync(metadataEntry, ct);
+			logger.LogInformation("Assets metadata succesfully refreshed.");
+		}
+		else
+		{
+			logger.LogInformation("Assets metadata is up to date. No refresh needed.");
+		}
+	}
+
+	// ------------------------------------------------------------------------------------------------------<
 
 	private async Task<HashSet<string>> GetProvidersAsync(CancellationToken ct)
 	{

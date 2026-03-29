@@ -75,6 +75,20 @@ public sealed class MarketDatabaseContext : IMarketDatabaseContext
 	}
 
 
+	public async Task<MetadataEntry?> GetMetadataEntryOrNullAsync(CancellationToken ct)
+	{
+		var filter = Builders<MetadataEntry>.Filter.Eq(x => x.Id, MetadataEntry.DefaultId);
+		return await GetSystemDocument(filter, ct);
+	}
+
+
+	public async Task SetMetadataEntryAsync(MetadataEntry entry, CancellationToken ct)
+	{
+		var filter = Builders<MetadataEntry>.Filter.Eq(x => x.Id, MetadataEntry.DefaultId);
+		await SetSystemDocument(filter, entry, ct);
+	}
+
+
 	public async Task<AssetRefreshMarker?> GetAssetsRefreshMarkerOrNullAsync(CancellationToken ct)
 	{
 		var filter = Builders<AssetRefreshMarker>.Filter.Eq(x => x.Id, AssetRefreshMarker.DefaultId);
